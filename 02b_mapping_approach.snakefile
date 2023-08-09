@@ -1,4 +1,4 @@
-# The goal of the snakefile is to bait out viral reads via mapping to see if:
+# The goal of this Snakefile is to bait out viral reads via mapping to see if:
 # 1) the viral genome we think we detected is actually in the sample
 # 2) if there is enough reads/information to assemble a genome or a capsid from the reads
 #

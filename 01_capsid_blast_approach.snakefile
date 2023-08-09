@@ -7,14 +7,14 @@
 
 import pandas as pd
 
-#metadata = pd.read_csv("inputs/concat_accessions_brain_03302023.csv", header = 0)
-metadata = pd.read_csv("inputs/concat_accessions_brain_03302023_small.csv", header = 0, sep = "\t")
+metadata = pd.read_csv("inputs/concat_accessions_brain_03302023_small.tsv", header = 0, sep = "\t")
 SAMPLES = metadata['Run'].unique().tolist()
 LINEAGES = ['bacteria', 'contam', 'archaea', 'fungi', 'protozoa']
+KSIZES = [21] 
 
 rule all:
     input:
-        expand("outputs/sourmash_gather_raw/{sample}.csv", sample = SAMPLES),
+        expand("outputs/sourmash_gather_raw/{sample}_k{ksize}.csv", sample = SAMPLES, ksize = KSIZES),
         expand('outputs/capsid_blast_raw_lca/{sample}_lca.tsv', sample = SAMPLES)
 
 rule download_runs:
@@ -33,11 +33,10 @@ rule download_runs:
 
 rule download_sourmash_databases_genbank:
     input: "inputs/sourmash_databases/sourmash-database-info.csv"
-    output: "inputs/sourmash_databases/genbank-2022.03-{lineage}-k21-scaled1k-cover.zip"
+    output: "inputs/sourmash_databases/genbank-2022.03-{lineage}-k{ksize}-scaled1k-cover.zip"
     run:
         sourmash_database_info = pd.read_csv(str(input[0]))
-        ksize = 21 
-        lineage_df = sourmash_database_info.loc[(sourmash_database_info['lineage'] == wildcards.lineage) & (sourmash_database_info['ksize'] == ksize)]
+        lineage_df = sourmash_database_info.loc[(sourmash_database_info['lineage'] == wildcards.lineage) & (sourmash_database_info['ksize'] == wildcards.ksize)]
         if lineage_df is None:
             raise TypeError("'None' value provided for lineage_df. Are you sure the sourmash database info csv was not empty?")
 
@@ -59,13 +58,13 @@ rule sourmash_sketch:
 rule sourmash_gather:
     input:
         sig="outputs/sourmash_sketch_raw/{sample}.sig",
-        db1=expand("inputs/sourmash_databases/genbank-2022.03-{lineage}-k21-scaled1k-cover.zip", lineage = LINEAGES),
-        db2="outputs/sourmash_databases/genbank-2023.03-viral-k21.zip"
-    output: "outputs/sourmash_gather_raw/{sample}.csv"
+        db1=expand("inputs/sourmash_databases/genbank-2022.03-{lineage}-k{ksize}-scaled1k-cover.zip", lineage = LINEAGES),
+        db2="outputs/sourmash_databases/genbank-2023.03-viral-k{ksize}.zip"
+    output: "outputs/sourmash_gather_raw/{sample}_k{ksize}.csv"
     benchmark: "benchmarks/sourmash_gather_raw/{sample}.tsv"
     conda: "envs/sourmash.yml"
     shell:'''
-    sourmash gather --threshold-bp 0 -k 21 -o {output} {input.sig} {input.db1} {input.db2}
+    sourmash gather --threshold-bp 0 -k {wildcards.ksize} -o {output} {input.sig} {input.db1} {input.db2}
     '''
 
 ############################################################

@@ -1,4 +1,4 @@
-# The goal of this notebook was to try and extract the assembly graph neighborhood around the samples of interest such that we could assemble a viral genome.
+# The goal of this Snakemake file was to try and extract the assembly graph neighborhood around the samples of interest such that we could assemble a viral genome.
 # This approach didn't work, either because:
 # 1) sample were too shallowly sequenced so the viral genome of interest didn't have enough coverage
 # 2) samples were too deeply sequenced and the neighborhood around the capsid of interest was too complex to pull anything out of.
@@ -12,19 +12,19 @@ SAMPLES = ['SRR1779416', 'SRR1779420', 'SRR1779422', 'SRR1779424', 'SRR8750801',
            'SRR1779200', 'SRR8750453', 'SRR8750456', 'SRR8750473', 'SRR8750491', 'SRR8750734',
            'SRR14788345', 'SRR14862884', 'SRR14999724', 'SRR14862871']
 LINEAGES = ['contam']
+KSIZES = [21]
 
 # hard-bind sample wildcard with VOGs id'd in those samples
 # these were made by interpretting the capsid BLAST results.
-SAMPLE_VOG = ['SRR14788345-1891718.YP_007346963.1', #'SRR14862871-1891718.YP_007346963.1', 
+SAMPLE_VOG = ['SRR14788345-1891718.YP_007346963.1', 'SRR14862871-1891718.YP_007346963.1', 
               'SRR14862884-1891718.YP_007346963.1', 'SRR14999724-1891718.YP_007346963.1', 
               'SRR8750801-1891718.YP_007346963.1', 'SRR1778915-1277649.YP_007354884.1', 
-              'SRR1779200-1277649.YP_007354884.1', #'SRR14862871-10798.YP_004928146.1', 
+              'SRR1779200-1277649.YP_007354884.1', 'SRR14862871-10798.YP_004928146.1', 
               'SRR8750456-10617.NP_040895.1', 'SRR8750473-10617.NP_040895.1', 'SRR8750734-10519.AP_000545.1']
 
 rule all:
     input:
-        #expand("outputs/sourmash_gather_abundtrim/{sample}.csv", sample = SAMPLES),
-        #expand("outputs/abundtrim/{sample}.abundtrim.fq.gz", sample = SAMPLES),
+        expand("outputs/sourmash_gather_abundtrim/{sample}_k{ksize}.csv", sample = SAMPLES, ksize = KSIZES),
         expand("outputs/capsid_blast_sgc/all_outputs/{sample_vog}.fasta.cdbg_ids.reads.gz", sample_vog = SAMPLE_VOG)
 
 rule download_runs:
@@ -32,6 +32,7 @@ rule download_runs:
         r1 = "inputs/raw/{sample}_pass_1.fastq.gz",
         r2 = "inputs/raw/{sample}_pass_2.fastq.gz"
     conda: 'envs/sratools.yml'
+    benchmark: "benchmarks/download_runs/{sample}.tsv"
     shell:'''
     fastq-dump --gzip --outdir inputs/raw --skip-technical --readids --read-filter pass --dumpbase --split-3 --clip {wildcards.sample}
     '''
@@ -71,14 +72,14 @@ rule kmer_trim:
     trim-low-abund.py --gzip -C 3 -Z 18 -M 30e9 -V {input} -o {output}
     '''
 
-## TODO: document capsid blast results -> reads -> blastn -> human & vector filtering -> sgc config files
 rule make_spacegraphcats_config:
+    """
+    for spacegraphcats, which orchestrates assembly graph queries, we use k-mer size 31 since this is the only validated k-size for this type of method.
+    """
     input: query = "outputs/capsid_blast_pident90/{sample}-{vog}.fasta"
     output: conf = "outputs/capsid_blast_sgc_conf/{sample}-{vog}.config"
     run:
-        #query_list = "\n- ".join(input.query)
-        with open(output.conf, 'wt') as fp:
-           print(f"""\
+        config_template = """\
 catlas_base: {wildcards.sample}
 input_sequences:
 - outputs/abundtrim/{wildcards.sample}.abundtrim.fq.gz
@@ -87,7 +88,9 @@ radius: 1
 paired_reads: false
 search:
 - {input.query}
-""", file=fp)
+"""
+        with open(output.conf, 'wt') as fp:
+            fp.write(config_template.format(sample=wildcards.sample, query=input.query))
 
 
 rule spacegraphcats:
@@ -106,15 +109,21 @@ rule spacegraphcats:
 
 ############################################################
 ## tmp evaluate to see how much more cleaning we need to do
+#
+# while with spacegraphcats we use a k-mer size of 31, with
+# sourmash we use a k-mer size of 21 because it's more
+# permissive. This means that even if the contaminant in our
+# sample is similar to but different from what we have in our
+# database, we'll still detect it. This is ideal for a contam
+# screen.
 ############################################################
 
 rule download_sourmash_databases_genbank:
     input: "inputs/sourmash_databases/sourmash-database-info.csv"
-    output: "inputs/sourmash_databases/genbank-2022.03-{lineage}-k21-scaled1k-cover.zip"
+    output: "inputs/sourmash_databases/genbank-2022.03-{lineage}-k{ksize}-scaled1k-cover.zip"
     run:
         sourmash_database_info = pd.read_csv(str(input[0]))
-        ksize = 21 
-        lineage_df = sourmash_database_info.loc[(sourmash_database_info['lineage'] == wildcards.lineage) & (sourmash_database_info['ksize'] == ksize)]
+        lineage_df = sourmash_database_info.loc[(sourmash_database_info['lineage'] == wildcards.lineage) & (sourmash_database_info['ksize'] == wildcards.ksize)]
         if lineage_df is None:
             raise TypeError("'None' value provided for lineage_df. Are you sure the sourmash database info csv was not empty?")
 
@@ -134,10 +143,10 @@ rule sourmash_sketch:
 rule sourmash_gather:
     input:
         sig="outputs/sourmash_sketch_abundtrim/{sample}.sig",
-        db=expand("inputs/sourmash_databases/genbank-2022.03-{lineage}-k21-scaled1k-cover.zip", lineage = LINEAGES),
-    output: "outputs/sourmash_gather_abundtrim/{sample}.csv"
+        db=expand("inputs/sourmash_databases/genbank-2022.03-{lineage}-k{ksize}-scaled1k-cover.zip", lineage = LINEAGES),
+    output: "outputs/sourmash_gather_abundtrim/{sample}_k{ksize}.csv"
     benchmark: "benchmarks/sourmash_gather_abundtrim/{sample}.tsv"
     conda: "envs/sourmash.yml"
     shell:'''
-    sourmash gather -k 21 -o {output} {input.sig} {input.db}
+    sourmash gather -k {wildcards.ksize} -o {output} {input.sig} {input.db}
     '''

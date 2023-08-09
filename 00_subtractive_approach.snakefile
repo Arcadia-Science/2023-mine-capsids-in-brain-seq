@@ -1,12 +1,16 @@
-# This goal of this pipeline was to iteratively remove human sequences from sequencing samples.
+# The goal of this pipeline was to iteratively remove human sequences from sequencing samples.
 # We then analyzed the leftover fractions to determine what non-human were comprised of, with the goal of finding viral sequences.
 # While the approach worked, it was computationally expensive to run.
 
 import pandas as pd
 
+# metadata and wild card definitions
 metadata = pd.read_csv("inputs/concat_accessions_brain_03302023.csv", header = 0)
 SAMPLES = metadata['Run'].unique().tolist()
 LINEAGES = ['bacteria', 'contam', 'archaea', 'fungi', 'protozoa']
+
+# download link declarations
+SALMON_INDEX = "http://refgenomes.databio.org/v3/assets/archive/2230c535660fb4774114bfa966a62f823fdb6d21acf138d4/salmon_sa_index?tag=default"
 
 rule all:
     input:
@@ -21,8 +25,9 @@ rule all:
 
 rule download_salmon_index:
     output: "inputs/references/salmon_sa_index.tgz"
+    parmas: salmon_index = SALMON_INDEX
     shell:'''
-    curl -JLo {output} http://refgenomes.databio.org/v3/assets/archive/2230c535660fb4774114bfa966a62f823fdb6d21acf138d4/salmon_sa_index?tag=default
+    curl -JLo {output} {params.salmon_index}
     '''
 
 rule decompress_salmon_index:
@@ -47,9 +52,6 @@ rule download_runs:
     shell:'''
     fastq-dump --gzip --outdir inputs/raw --skip-technical --readids --read-filter pass --dumpbase --split-3 --clip {wildcards.sample}
     '''
-
-#rule download_sequencing_data:
-# deal with this later -- didn't check whether sratools is still broken on osx64, just downloaded straight from ENA for now
 
 rule salmon:
     input:
