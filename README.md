@@ -6,21 +6,31 @@ This repository is associated with the pub, ["A capsid-based search recovers vir
 
 Below we provide an explanation of the files in this repository.
 
-
 ### Analysis code
 
-#### Snakefiles
+The majority of the code in this repository is orchestrated by snakefiles.
+Skip to the [Running the code in this repository](#running-the-code-in-this-repository) section of the README for a description of how to run these files.
 
-This repository 
-[inputs](./inputs)
-[dags](./dags)
-[envs](./envs)
-[scripts](./scripts)
+* [`00_subtractive_approach.snakefile`](00_subtractive_approach.snakefile):
+* [`01_capsid_blast_approach.snakefile`](01_capsid_blast_approach.snakefile):
+* [`02a_assembly_graph_approach.snakefile`](02a_assembly_graph_approach.snakefile):
+* [`02b_mapping_approach.snakefile`](02b_mapping_approach.snakefile):
+
+The [dags](./dags) folder provides directed acyclic graphs for each of the workflows.
+
+
+Two snakefiles build input databases for the other workflows.
+* `[build-viral-database.snakefile](./build-viral-database.snakefile)`:
+* `[build-capsid-db.snakefile](./build-capsid-db.snakefile)`:
+
+The snakefiles make use of the [inputs](./inputs), [envs](./envs), and [scripts](./scripts) folders.
+The [inputs](./inputs) folder contains tabular files with metadata about the samples that are analyzed by the workflows.
+The [envs](./envs) folder contains conda environments for the rules in the snakefile.
+The [scripts](./scripts) folder contains scripts that are run by different rules. 
 
 #### [Notebooks](./notebooks)
 
 ### [Outputs](./outputs)
-
 
 
 ## Running the code in this repository
