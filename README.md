@@ -16,12 +16,9 @@ Skip to the [Running the code in this repository](#running-the-code-in-this-repo
 * [`02a_assembly_graph_approach.snakefile`](02a_assembly_graph_approach.snakefile):
 * [`02b_mapping_approach.snakefile`](02b_mapping_approach.snakefile):
 
-The [dags](./dags) folder provides directed acyclic graphs for each of the workflows.
-
-
 Two snakefiles build input databases for the other workflows.
-* `[build-viral-database.snakefile](./build-viral-database.snakefile)`:
-* `[build-capsid-db.snakefile](./build-capsid-db.snakefile)`:
+* `[build-viral-database.snakefile](./build-viral-database.snakefile)`: builds a k-mer database of viral sequences (sourmash FracMinHash database).
+* `[build-capsid-db.snakefile](./build-capsid-db.snakefile)`: builds the viral capside sequence database used to search sequencing data sets with diamond blastx.
 
 The snakefiles make use of the [inputs](./inputs), [envs](./envs), and [scripts](./scripts) folders.
 The [inputs](./inputs) folder contains tabular files with metadata about the samples that are analyzed by the workflows.
