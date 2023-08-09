@@ -1,0 +1,12 @@
+Bioproject	Number of people in study	Nucleic Acid	Data filtering 	Number seq runs included for analysis	Full study data	Description
+PRJNA690013	16	RNA	COVID-19 infected people and controls. Using all data in bioproject. 	16	RNA, bulk	Frontal cortex transcriptome of 9 COVID-19 patients and 7 age matched controls (16 humans)
+PRJNA733513	5	RNA	Cell culture data in Bioproject, also 10x data paired to bulk RNA seq. Only want bulk human data	5	RNA, bulk RNA, sn-10x	Paired nuclear/cytoplasmic transcriptomes , for 5 humans
+PRJNA434002	31	RNA	Bulk and 10x data from human subjects. Only using bulk. Some subjects samples twice, most only once. 	41	RNA, bulk RNA, sn-10x	Bulk, single nucleous RNA seq of ASD and neurotypical humans . Bulk data for 41 tissue samples, 15 ASD and 16 control. 
+PRJNA527986	4	RNA	Bulk data from human and NHP.  Using human only 	132	RNA, bulk RNA	Bulk and single nucleous data for 4 humans and 9 NHP. Single nucleous data on GEO. 33 tissue samples/human. 
+PRJNA736951	3	DNA	Removing CHIPseq and MPAS data that are also included in this bioproject	80	DNA, bulk and single nucleous	Somatic Mosaicism Reveals Clonal Distributions of Neocortical Development (4 humans - data for ID01 not on SRA)
+PRJNA245456	1	DNA	This project has single cell, bulk for brain and then one heart dataset. Removing heart. 	18	DNA, bulk and single cell	Single-neuron whole-genome analysis of spatial patterns of somatic mutation in the human brain (1 humans)
+PRJEB24579	8	RNA and DNA	This project has liver and cell line data too. Removing to only use brain data. Single cell data comes from one person, then bulk RNA seq not .Removing bisulfite seq and RC seq 	70	DNA, bulk and single nucleous RNA, bulk	Paired bulk liver and brain transcriptome for 8 humans, + WGS and snSeq for 1 human brain
+PRJNA273155	2	DNA	Removed WXS sequencing datasets, removed blood datasets . 2 individuals in dataset. 	156	DNA, single nucleous	Whole-genome sequencing of whole-genome amplified DNA from single nuclei from  brain tumor patients , then just bulk data from one patient. WBCs also in study. 
+PRJNA374898	4	DNA	Filtering out all body sites except for brain	33	DNA, bulk	Body site sampling from 4 human.
+PRJNA870417	6	DNA	All samples are brain WGS samples	6	DNA, bulk	WGS from 6 humans
+PRJNA936291	1	DNA	All bulk brain WGS	4	DNA, bulk	WGS from 1 human with brain tumor

@@ -1,0 +1,58 @@
+digraph snakemake_dag {
+    graph[bgcolor=white, margin=0];
+    node[shape=box, style=rounded, fontname=sans,                 fontsize=10, penwidth=2];
+    edge[penwidth=2, color=grey];
+	0[label = "all", color = "0.33 0.6 0.85", style="rounded"];
+	1[label = "sourmash_gather_bbduk", color = "0.07 0.6 0.85", style="rounded"];
+	2[label = "sourmash_sketch_bbduk", color = "0.41 0.6 0.85", style="rounded"];
+	3[label = "remove_human_host", color = "0.26 0.6 0.85", style="rounded"];
+	4[label = "fastp", color = "0.11 0.6 0.85", style="rounded"];
+	5[label = "extract_unmapped_reads_salmon\npair: 1", color = "0.63 0.6 0.85", style="rounded"];
+	6[label = "download_runs\nsample: SRR13367152", color = "0.37 0.6 0.85", style="rounded"];
+	7[label = "filter_unmapped_reads", color = "0.48 0.6 0.85", style="rounded"];
+	8[label = "salmon", color = "0.00 0.6 0.85", style="rounded"];
+	9[label = "decompress_salmon_index", color = "0.44 0.6 0.85", style="rounded"];
+	10[label = "download_salmon_index", color = "0.59 0.6 0.85", style="rounded,dashed"];
+	11[label = "extract_unmapped_reads_salmon\npair: 2", color = "0.63 0.6 0.85", style="rounded"];
+	12[label = "download_sourmash_databases_genbank\nlineage: bacteria", color = "0.04 0.6 0.85", style="rounded"];
+	13[label = "download_sourmash_databases_genbank\nlineage: contam", color = "0.04 0.6 0.85", style="rounded"];
+	14[label = "download_sourmash_databases_genbank\nlineage: archaea", color = "0.04 0.6 0.85", style="rounded"];
+	15[label = "download_sourmash_databases_genbank\nlineage: fungi", color = "0.04 0.6 0.85", style="rounded"];
+	16[label = "download_sourmash_databases_genbank\nlineage: protozoa", color = "0.04 0.6 0.85", style="rounded"];
+	17[label = "assemble", color = "0.52 0.6 0.85", style="rounded"];
+	18[label = "bwa_evaluate", color = "0.30 0.6 0.85", style="rounded"];
+	19[label = "bwa_mem", color = "0.15 0.6 0.85", style="rounded"];
+	20[label = "index_megahit", color = "0.56 0.6 0.85", style="rounded"];
+	21[label = "add_lineage_information_to_capsid_results", color = "0.22 0.6 0.85", style="rounded"];
+	22[label = "search_for_capsid_proteins_in_leftover_reads", color = "0.19 0.6 0.85", style="rounded"];
+	1 -> 0
+	17 -> 0
+	18 -> 0
+	21 -> 0
+	2 -> 1
+	12 -> 1
+	13 -> 1
+	14 -> 1
+	15 -> 1
+	16 -> 1
+	3 -> 2
+	4 -> 3
+	5 -> 4
+	11 -> 4
+	6 -> 5
+	7 -> 5
+	8 -> 7
+	6 -> 8
+	9 -> 8
+	10 -> 9
+	6 -> 11
+	7 -> 11
+	3 -> 17
+	19 -> 18
+	3 -> 19
+	20 -> 19
+	17 -> 19
+	17 -> 20
+	22 -> 21
+	3 -> 22
+}            
