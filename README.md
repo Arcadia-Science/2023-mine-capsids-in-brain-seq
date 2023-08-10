@@ -11,14 +11,14 @@ Below we provide an explanation of the files in this repository.
 The majority of the code in this repository is orchestrated by snakefiles.
 Skip to the [Running the code in this repository](#running-the-code-in-this-repository) section of the README for a description of how to run these files.
 
-* [`00_subtractive_approach.snakefile`](00_subtractive_approach.snakefile):
-* [`01_capsid_blast_approach.snakefile`](01_capsid_blast_approach.snakefile):
-* [`02a_assembly_graph_approach.snakefile`](02a_assembly_graph_approach.snakefile):
-* [`02b_mapping_approach.snakefile`](02b_mapping_approach.snakefile):
+* [`00_subtractive_approach.snakefile`](00_subtractive_approach.snakefile): This snakefile contains our original approach, which used increasingly expensive computational tools to remove human sequences from DNA and RNA seq data. Our goal was to be able to explore what was in the "leftover" fraction of reads, and to perform viral discovery on that fraction. This approach was too computationally expensive to run on hundreds of samples, so we moved to a new approach.
+* [`01_capsid_blast_approach.snakefile`](01_capsid_blast_approach.snakefile): This snakefile implements a DIAMOND BLASTx search for viral capsid protein sequences. We used this to quickly discover potential viral sequences in DNA and RNA seq data. It also uses sourmash gather to detect background contamination in the raw sequencing data.
+* [`02a_assembly_graph_approach.snakefile`](02a_assembly_graph_approach.snakefile): This snakefile uses spacegraphcats to perform assembly graph queries with viral capsid reads identified in `01_capsid_blast_approach.snakefile`. The goal of this snakefile was to recover reads that are nearby to capsid sequences in the assembly graph and to use those reads to assemble more complete viral genomes. However, this approach either failed because the reads were too low coverage in areas with viral capsids, leading to fragmented assembly graphs, or because the regions of the graph were too complex around the viral genomes and not resolvable to contiguous sequences. 
+* [`02b_mapping_approach.snakefile`](02b_mapping_approach.snakefile): This snakefile orchestrates mapping of the reads against viral genomes to estimate coverage of the genome and whether that virus was truly present in the sequencing data.
 
 Two snakefiles build input databases for the other workflows.
-* `[build-viral-database.snakefile](./build-viral-database.snakefile)`: builds a k-mer database of viral sequences (sourmash FracMinHash database).
-* `[build-capsid-db.snakefile](./build-capsid-db.snakefile)`: builds the viral capside sequence database used to search sequencing data sets with diamond blastx.
+* [`build-viral-database.snakefile`](./build-viral-database.snakefile): builds a k-mer database of viral sequences (sourmash FracMinHash database).
+* [`build-capsid-db.snakefile`](./build-capsid-db.snakefile): builds the viral capsid sequence database used to search sequencing data sets with diamond blastx.
 
 The snakefiles make use of the [inputs](./inputs), [envs](./envs), and [scripts](./scripts) folders.
 The [inputs](./inputs) folder contains tabular files with metadata about the samples that are analyzed by the workflows.
@@ -26,6 +26,12 @@ The [envs](./envs) folder contains conda environments for the rules in the snake
 The [scripts](./scripts) folder contains scripts that are run by different rules. 
 
 #### [Notebooks](./notebooks)
+
+This repository contains three notebooks:
+
+* [`20230426-explore-capsid-blast-results.ipynb`](./notebooks/20230426-explore-capsid-blast-results.ipynb): explores the results of the capsid BLAST analysis undertaken in `01_capsid_blast_approach.snakefile`. It examines filtering cut offs for the capsid BLAST results and writes FASTA files of the BLAST hits.
+* [`20230428-blast-has-virus.ipynb`](./notebooks/20230428-blast-has-virus.ipynb): looks at the results of BLASTing the capsid reads (FASTA) against the NCBI nucleotide (nt) database. It filters out human and vector/clone hits.
+* [`20230512-interpret-mapping.ipynb`](./notebooks/20230512-interpret-mapping.ipynb): interprets the mapping undertaken in `02b_mapping_approach.snakefile`. For viral genomes that were high coverage, it produces visualizations of read depth across the reference genomes.
 
 ### [Outputs](./outputs)
 
