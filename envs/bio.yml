@@ -1,8 +1,0 @@
-channels:
-   - conda-forge
-   - bioconda
-   - defaults
-dependencies:
-   - pip
-   - pip:
-       - bio==1.5.9
