@@ -1,6 +1,6 @@
 # Mining viral sequences from human brain sequencing data via capsid searches
 
-This repository is associated with the pub, ["A capsid-based search recovers viral sequences from human brain sequencing data"](ADD LINK DOI WHEN AVAILABLE).
+This repository is associated with the pub, ["A capsid-based search recovers viral sequences from human brain sequencing data"](https://doi.org/10.57844/arcadia-1a71-ef4d).
 
 ## Explanation of the files in this repository
 
@@ -85,5 +85,4 @@ where:
 
 ## Citation
 
-If you use the code or ideas in this repository for your own work, please cite:
-FILL IN WITH PUB DOI/CITATION
+If you use the code or ideas in this repository for your own work, please cite DOI: 10.57844/arcadia-1a71-ef4d
