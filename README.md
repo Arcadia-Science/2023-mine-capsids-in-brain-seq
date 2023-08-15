@@ -83,6 +83,7 @@ where:
 * `-k` tells the pipeline to continue with independent steps when one step fails
 * `-n` signifies to run a dry run first
 
-## Citation
+## Contributing & Citation
 
-If you use the code or ideas in this repository for your own work, please cite DOI: 10.57844/arcadia-1a71-ef4d
+If you use the code or ideas in this repository for your own work, please cite DOI: [10.57844/arcadia-1a71-ef4d](https://doi.org/10.57844/arcadia-1a71-ef4d).
+If you would like to contribute to this repository, please read our [guide on credit for contributions](https://github.com/Arcadia-Science/arcadia-software-handbook/blob/main/guides-and-standards/guide-credit-for-contributions.md).
